@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Flight, FlightsResponse } from "../../types/flight";
 import { ts } from "../utils/log";
 
-const POLL_MS = 30_000;
+const POLL_MS = 10_000;
 
 export function useFlights() {
   const [flights, setFlights] = useState<Flight[]>([]);

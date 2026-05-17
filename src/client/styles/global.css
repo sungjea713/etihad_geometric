@@ -453,7 +453,7 @@ html, body, #root {
   .status-full { display: none; }
   .status-short { display: inline; }
 
-  /* FlightTable — full-width drawer on mobile */
+  /* FlightTable — full-width drawer on mobile when expanded */
   .flight-table {
     top: auto;
     bottom: 0;
@@ -468,8 +468,36 @@ html, body, #root {
     border-bottom: none;
     box-sizing: border-box;
   }
+  /* Collapsed on mobile = just a floating "+" button in the top-right */
   .flight-table.ft-collapsed {
+    top: 56px;
+    bottom: auto;
+    right: 12px;
+    left: auto;
+    width: auto;
+    max-width: none;
     max-height: none;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    border-radius: 0;
+  }
+  .flight-table.ft-collapsed .ft-header {
+    padding: 0;
+    background: transparent;
+    border: none;
+  }
+  .flight-table.ft-collapsed .ft-title { display: none; }
+  .flight-table.ft-collapsed .ft-collapse {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(6, 16, 22, 0.92);
+    border: 1px solid rgba(0, 255, 156, 0.5);
+    box-shadow: 0 0 14px rgba(0, 255, 156, 0.25);
+    font-size: 20px;
+    margin: 0;
   }
   .ft-header {
     padding: 8px 10px;

@@ -12,12 +12,12 @@ interface TierConfig {
 }
 
 const TIERS: TierConfig[] = [
-  // silver: ~every 5–8s
-  { name: "silver", color: [210, 220, 232], spawnProb: 0.0035, size: 2.0, trailMul: 0.14, haloSize: 16 },
-  // golden: ~every 25–40s
-  { name: "golden", color: [255, 215, 0], spawnProb: 0.0008, size: 2.6, trailMul: 0.18, haloSize: 22 },
-  // platinum: ~every 90–150s
-  { name: "platinum", color: [185, 242, 255], spawnProb: 0.00018, size: 3.2, trailMul: 0.22, haloSize: 30 },
+  // silver: ~every 3–5s
+  { name: "silver", color: [210, 220, 232], spawnProb: 0.005, size: 2.0, trailMul: 0.14, haloSize: 16 },
+  // golden: ~every 18–28s
+  { name: "golden", color: [255, 215, 0], spawnProb: 0.0012, size: 2.6, trailMul: 0.18, haloSize: 22 },
+  // platinum: ~every 60–100s
+  { name: "platinum", color: [185, 242, 255], spawnProb: 0.0003, size: 3.2, trailMul: 0.22, haloSize: 30 },
 ];
 
 interface Shoot {
@@ -68,11 +68,29 @@ export function ShootingStarField({ onPick }: Props) {
     ro.observe(canvas);
 
     function spawn(tier: TierConfig, t: number) {
-      const fromTop = Math.random() < 0.7;
-      const startX = fromTop ? Math.random() * width * 0.9 : -20;
-      const startY = fromTop ? -20 : Math.random() * height * 0.4;
-      const angle = Math.PI * 0.18 + Math.random() * Math.PI * 0.18;
-      const speed = 450 + Math.random() * 350;
+      // pick an edge to enter from: top, top-left, or left
+      const r = Math.random();
+      let startX: number;
+      let startY: number;
+      if (r < 0.35) {
+        // enter from top
+        startX = Math.random() * width * 0.9;
+        startY = -40;
+      } else if (r < 0.7) {
+        // enter from top-left corner
+        startX = -40;
+        startY = -40 + Math.random() * height * 0.4;
+      } else {
+        // enter from left edge
+        startX = -40;
+        startY = Math.random() * height * 0.7;
+      }
+      // angle: 25°–70° down-right
+      const angle = Math.PI * 0.14 + Math.random() * Math.PI * 0.25;
+      // make the star cross the screen in ~3.5–5.5s regardless of viewport size
+      const crossTime = 3500 + Math.random() * 2000;
+      const dist = Math.hypot(width, height) + 200;
+      const speed = (dist / crossTime) * 1000; // px/s
       const id = nextId++;
       shootsRef.current.push({
         id,
@@ -81,7 +99,7 @@ export function ShootingStarField({ onPick }: Props) {
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         t0: t,
-        duration: 1800 + Math.random() * 1200,
+        duration: crossTime + 600,
         lastT: t,
         tier,
       });

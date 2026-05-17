@@ -4,7 +4,9 @@ import type { Airport, Flight, FlightsResponse } from "../types/flight";
 
 const TTL_MS = 90_000;
 const STALE_MS = 30 * 60 * 1000;
-const ROUTE_REFETCH_MS = 6 * 3600 * 1000;
+const ROUTE_REFETCH_OK_MS = 6 * 3600 * 1000;       // full success — refresh every 6h
+const ROUTE_REFETCH_PARTIAL_MS = 15 * 60 * 1000;   // got the page but missing fields — retry in 15m
+const ROUTE_REFETCH_FAIL_MS = 5 * 60 * 1000;       // page fetch errored / empty — retry in 5m
 
 interface Entry {
   latest: Omit<Flight, "origin" | "destination" | "takeoff" | "landing" | "aircraftType">;
@@ -28,7 +30,15 @@ async function enrichRoute(icao24: string, callsign: string) {
   entry.routeInFlight = true;
   try {
     const route = await fetchFlightAwareRoute(callsign);
-    entry.routeFetchedAt = Date.now();
+    if (!route) {
+      // FlightAware fetch failed or page had no bootstrap JSON — short retry
+      entry.routeFetchedAt = Date.now() - (ROUTE_REFETCH_OK_MS - ROUTE_REFETCH_FAIL_MS);
+    } else if (!route.origin && !route.destination) {
+      // got the page but no airport info — retry in 15m
+      entry.routeFetchedAt = Date.now() - (ROUTE_REFETCH_OK_MS - ROUTE_REFETCH_PARTIAL_MS);
+    } else {
+      entry.routeFetchedAt = Date.now();
+    }
     if (route?.origin) entry.origin = route.origin;
     if (route?.destination) entry.destination = route.destination;
     if (route?.takeoff) entry.takeoff = route.takeoff;
@@ -36,6 +46,8 @@ async function enrichRoute(icao24: string, callsign: string) {
     if (route?.aircraftType) entry.aircraftType = route.aircraftType;
   } catch (e) {
     console.error("[enrich]", callsign, e);
+    // also a short retry on throw
+    entry.routeFetchedAt = Date.now() - (ROUTE_REFETCH_OK_MS - ROUTE_REFETCH_FAIL_MS);
   } finally {
     entry.routeInFlight = false;
   }
@@ -67,7 +79,7 @@ async function doRefresh(): Promise<void> {
     const stale =
       callsignChanged ||
       !prev?.routeFetchedAt ||
-      now - prev.routeFetchedAt > ROUTE_REFETCH_MS;
+      now - prev.routeFetchedAt > ROUTE_REFETCH_OK_MS;
     if (stale) {
       enrichRoute(s.icao24, s.callsign);
     }
