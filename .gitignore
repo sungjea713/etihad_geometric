@@ -8,3 +8,9 @@ public/cesium/
 !.claude/rules/
 !.claude/rules/**
 quotes/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
