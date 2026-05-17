@@ -38,6 +38,40 @@ export async function handleApi(req: Request): Promise<Response | null> {
       return json({ ok: true, ...getStatus() });
     }
 
+    if (path === "/api/diag" && req.method === "GET") {
+      const targets = [
+        "https://example.com",
+        "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token",
+        "https://opensky-network.org/api/states/all",
+        "https://ko.flightaware.com/live/flight/ETD1",
+      ];
+      const results: Array<{ url: string; status?: number; ms: number; error?: string }> = [];
+      for (const target of targets) {
+        const t0 = Date.now();
+        try {
+          const r = await fetch(target, { method: target.includes("token") ? "POST" : "GET" });
+          results.push({ url: target, status: r.status, ms: Date.now() - t0 });
+        } catch (e) {
+          const err = e as Error & { code?: string; cause?: unknown };
+          results.push({
+            url: target,
+            ms: Date.now() - t0,
+            error: `${err.message} | code=${err.code ?? "n/a"} | cause=${JSON.stringify(err.cause ?? null)}`,
+          });
+        }
+      }
+      return json({
+        bunVersion: typeof Bun !== "undefined" ? Bun.version : "unknown",
+        env: {
+          OPENSKY_CLIENT_ID_set: !!process.env.OPENSKY_CLIENT_ID,
+          OPENSKY_CLIENT_SECRET_set: !!process.env.OPENSKY_CLIENT_SECRET,
+          OPENSKY_CLIENT_ID_len: process.env.OPENSKY_CLIENT_ID?.length ?? 0,
+          OPENSKY_CLIENT_SECRET_len: process.env.OPENSKY_CLIENT_SECRET?.length ?? 0,
+        },
+        results,
+      });
+    }
+
     return null;
   } catch (err) {
     console.error("[api]", path, err);

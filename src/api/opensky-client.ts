@@ -24,11 +24,21 @@ async function fetchAccessToken(): Promise<string> {
     client_secret: clientSecret,
   });
 
-  const res = await fetch(TOKEN_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
+  let res: Response;
+  try {
+    res = await fetch(TOKEN_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "EtihadGeometric/1.0 (+https://github.com/sungjea713/etihad_geometric)",
+        Accept: "application/json",
+      },
+      body,
+    });
+  } catch (e) {
+    const err = e as Error & { code?: string; cause?: unknown };
+    throw new Error(`OpenSky token fetch threw: ${err.message} | code=${err.code ?? "n/a"} | cause=${JSON.stringify(err.cause ?? null)}`);
+  }
 
   if (!res.ok) {
     throw new Error(`OpenSky token failed: ${res.status} ${await res.text()}`);
@@ -90,7 +100,11 @@ export async function fetchLastFlight(icao24: string): Promise<AircraftFlightRec
 export async function fetchEtihadStates(): Promise<Omit<Flight, "origin" | "destination">[]> {
   const token = await fetchAccessToken();
   const res = await fetch(STATES_URL, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "User-Agent": "EtihadGeometric/1.0 (+https://github.com/sungjea713/etihad_geometric)",
+      Accept: "application/json",
+    },
   });
 
   if (!res.ok) {

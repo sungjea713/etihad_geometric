@@ -7,3 +7,4 @@ public/cesium/
 .claude/*
 !.claude/rules/
 !.claude/rules/**
+quotes/
