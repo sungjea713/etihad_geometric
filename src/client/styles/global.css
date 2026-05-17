@@ -552,33 +552,37 @@ html, body, #root {
   .loading-title { font-size: 13px; letter-spacing: 1px; }
   .loading-sub { font-size: 10px; }
 
-  /* LuckCard — fit the viewport with a fixed top/bottom margin */
+  /* LuckCard — fixed ~2/3 viewport height with internal scroll */
   .luck-overlay { padding: 16px; box-sizing: border-box; }
   .luck-card {
     width: calc(100vw - 24px);
     max-width: 100%;
-    height: auto;
-    max-height: calc(100vh - 32px);
-    padding: 22px 18px 18px;
+    height: 66vh;
+    height: 66dvh;
+    max-height: 66vh;
+    max-height: 66dvh;
+    padding: 20px 18px 16px;
     border-radius: 12px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
   }
-  .luck-clover-wrap { width: 140px; height: 140px; margin-bottom: 12px; flex-shrink: 0; }
-  .luck-clover { width: 110px; height: 110px; }
-  .luck-title { font-size: 14px; letter-spacing: 0.9px; }
+  .luck-clover-wrap { width: 130px; height: 130px; margin: 0 auto 10px; flex-shrink: 0; }
+  .luck-clover { width: 100px; height: 100px; }
+  .luck-title { font-size: 14px; letter-spacing: 0.9px; flex-shrink: 0; }
   .luck-plus { font-size: 24px; }
-  .luck-points { margin-bottom: 4px; }
+  .luck-points { margin-bottom: 4px; flex-shrink: 0; }
   .luck-quote {
-    margin: 14px -10px 0;
-    padding: 12px 10px 4px;
-    flex: 1;
+    margin: 12px -10px 0;
+    padding: 10px 10px 4px;
+    flex: 1 1 auto;
     min-height: 0;
+    overflow: hidden;
   }
   .luck-quote-scroll {
-    max-height: none;
-    flex: 1;
+    max-height: 100%;
+    height: 100%;
+    overflow-y: auto;
   }
   .luck-quote-translation { font-size: 13px; }
   .luck-quote-original { font-size: 11px; }
