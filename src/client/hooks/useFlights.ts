@@ -7,6 +7,7 @@ const POLL_MS = 30_000;
 export function useFlights() {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [lastUpdate, setLastUpdate] = useState<number>(0);
+  const [enriching, setEnriching] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -25,6 +26,7 @@ export function useFlights() {
         if (cancelled) return;
         setFlights(data.flights);
         setLastUpdate(data.lastRefresh);
+        setEnriching(data.enriching ?? 0);
         setError(null);
         ts("setstate_done");
       } catch (e) {
@@ -60,5 +62,5 @@ export function useFlights() {
     };
   }, []);
 
-  return { flights, lastUpdate, error };
+  return { flights, lastUpdate, enriching, error };
 }

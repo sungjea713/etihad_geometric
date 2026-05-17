@@ -22,7 +22,7 @@ function App() {
   const [mapReady, setMapReady] = useState(false);
   const [visibleSet, setVisibleSet] = useState<Set<string>>(new Set());
   const initializedRef = useRef(false);
-  const { flights, lastUpdate, error } = useFlights();
+  const { flights, lastUpdate, enriching, error } = useFlights();
 
   useEffect(() => {
     const onPop = () => setTab(tabFromPath(location.pathname));
@@ -75,7 +75,8 @@ function App() {
       <div className="main">
         <LoadingHud
           flightCount={flights.length}
-          enrichedCount={flights.filter((f) => f.origin).length}
+          enrichedCount={flights.length - enriching}
+          enriching={enriching}
           lastUpdate={lastUpdate}
           mapReady={mapReady}
         />

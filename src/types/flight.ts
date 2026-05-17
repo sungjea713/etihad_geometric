@@ -30,4 +30,5 @@ export interface FlightsResponse {
   flights: Flight[];
   lastRefresh: number;
   count: number;
+  enriching: number;
 }

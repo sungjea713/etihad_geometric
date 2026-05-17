@@ -4,6 +4,7 @@ import { ts } from "../utils/log";
 interface Props {
   flightCount: number;
   enrichedCount: number;
+  enriching: number;
   lastUpdate: number;
   mapReady: boolean;
 }
@@ -48,7 +49,7 @@ const T_PSEUDO_DONE = 3500;
 
 type Stage = "boot" | "scan" | "enrich" | "render";
 
-export function LoadingHud({ flightCount, enrichedCount, lastUpdate, mapReady }: Props) {
+export function LoadingHud({ flightCount, enrichedCount, enriching, lastUpdate, mapReady }: Props) {
   const mountedAtRef = useRef(Date.now());
   const [now, setNow] = useState(Date.now());
   const [phase, setPhase] = useState<"show" | "fade" | "hidden">("show");
@@ -64,7 +65,7 @@ export function LoadingHud({ flightCount, enrichedCount, lastUpdate, mapReady }:
   const pseudoDone = elapsed >= T_PSEUDO_DONE;
 
   const dataReady =
-    lastUpdate > 0 && flightCount > 0 && enrichedCount >= flightCount;
+    lastUpdate > 0 && flightCount > 0 && enriching === 0;
   const allReady = pseudoDone && dataReady && mapReady;
 
   useEffect(() => {

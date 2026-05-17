@@ -98,7 +98,9 @@ export async function getFlights(): Promise<FlightsResponse> {
     console.error("[flight-cache] refresh failed:", err);
   }
   const flights: Flight[] = [];
+  let enriching = 0;
   for (const entry of store.values()) {
+    if (!entry.routeFetchedAt) enriching++;
     flights.push({
       ...entry.latest,
       origin: entry.origin,
@@ -108,7 +110,7 @@ export async function getFlights(): Promise<FlightsResponse> {
       aircraftType: entry.aircraftType,
     });
   }
-  return { flights, lastRefresh, count: flights.length };
+  return { flights, lastRefresh, count: flights.length, enriching };
 }
 
 export function getStatus() {
