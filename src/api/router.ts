@@ -45,21 +45,24 @@ export async function handleApi(req: Request): Promise<Response | null> {
         "https://opensky-network.org/api/states/all",
         "https://ko.flightaware.com/live/flight/ETD1",
       ];
-      const results: Array<{ url: string; status?: number; ms: number; error?: string }> = [];
-      for (const target of targets) {
+      const probe = async (target: string) => {
         const t0 = Date.now();
         try {
-          const r = await fetch(target, { method: target.includes("token") ? "POST" : "GET" });
-          results.push({ url: target, status: r.status, ms: Date.now() - t0 });
+          const r = await fetch(target, {
+            method: target.includes("token") ? "POST" : "GET",
+            signal: AbortSignal.timeout(5000),
+          });
+          return { url: target, status: r.status, ms: Date.now() - t0 };
         } catch (e) {
           const err = e as Error & { code?: string; cause?: unknown };
-          results.push({
+          return {
             url: target,
             ms: Date.now() - t0,
             error: `${err.message} | code=${err.code ?? "n/a"} | cause=${JSON.stringify(err.cause ?? null)}`,
-          });
+          };
         }
-      }
+      };
+      const results = await Promise.all(targets.map(probe));
       return json({
         bunVersion: typeof Bun !== "undefined" ? Bun.version : "unknown",
         env: {
