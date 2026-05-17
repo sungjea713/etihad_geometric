@@ -30,17 +30,6 @@ interface Star {
   lifespan: number;
 }
 
-interface Shoot {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  t0: number;
-  duration: number;
-  lastT: number;
-  color: [number, number, number];
-}
-
 function pickColor(): [number, number, number] {
   return COLORS[Math.floor(Math.random() * COLORS.length)];
 }
@@ -75,8 +64,6 @@ export function StarField() {
     let height = 0;
     const dpr = window.devicePixelRatio || 1;
     const stars: Star[] = [];
-    const shoots: Shoot[] = [];
-
     function build() {
       const t = performance.now();
       stars.length = 0;
@@ -98,25 +85,6 @@ export function StarField() {
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
-
-    function spawnShoot(t: number) {
-      // start from upper-left quadrant, travel diagonally down-right
-      const fromTop = Math.random() < 0.7;
-      const startX = fromTop ? Math.random() * width * 0.9 : -20;
-      const startY = fromTop ? -20 : Math.random() * height * 0.4;
-      const angle = Math.PI * 0.18 + Math.random() * Math.PI * 0.18; // 32° ~ 65°
-      const speed = 700 + Math.random() * 500;
-      shoots.push({
-        x: startX,
-        y: startY,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        t0: t,
-        duration: 900 + Math.random() * 500,
-        lastT: t,
-        color: Math.random() < 0.85 ? [255, 255, 255] : pickColor(),
-      });
-    }
 
     let raf = 0;
     function tick() {
@@ -196,55 +164,6 @@ export function StarField() {
           ctx.lineTo(s.x, s.y + spikeLen);
           ctx.stroke();
         }
-      }
-
-      // shooting stars — ~1 every 8–12s
-      if (Math.random() < 0.002) spawnShoot(t);
-
-      for (let i = shoots.length - 1; i >= 0; i--) {
-        const sh = shoots[i];
-        const age = t - sh.t0;
-        const lifeProgress = age / sh.duration;
-        if (lifeProgress >= 1 || sh.x > width + 100 || sh.y > height + 100) {
-          shoots.splice(i, 1);
-          continue;
-        }
-        const dt = (t - sh.lastT) / 1000;
-        sh.x += sh.vx * dt;
-        sh.y += sh.vy * dt;
-        sh.lastT = t;
-
-        const fadeIn = Math.min(1, lifeProgress * 5);
-        const fadeOut = Math.min(1, (1 - lifeProgress) * 3);
-        const a = Math.min(fadeIn, fadeOut);
-        const [r, g, b] = sh.color;
-        const tailX = sh.x - sh.vx * 0.14;
-        const tailY = sh.y - sh.vy * 0.14;
-
-        // tail
-        const grad = ctx.createLinearGradient(sh.x, sh.y, tailX, tailY);
-        grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${a})`);
-        grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.8;
-        ctx.beginPath();
-        ctx.moveTo(sh.x, sh.y);
-        ctx.lineTo(tailX, tailY);
-        ctx.stroke();
-
-        // head glow
-        const halo = ctx.createRadialGradient(sh.x, sh.y, 0, sh.x, sh.y, 14);
-        halo.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${a * 0.9})`);
-        halo.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
-        ctx.fillStyle = halo;
-        ctx.beginPath();
-        ctx.arc(sh.x, sh.y, 14, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = `rgba(255, 255, 255, ${a})`;
-        ctx.beginPath();
-        ctx.arc(sh.x, sh.y, 2.2, 0, Math.PI * 2);
-        ctx.fill();
       }
 
       raf = requestAnimationFrame(tick);

@@ -8,6 +8,7 @@ export function useFlights() {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [lastUpdate, setLastUpdate] = useState<number>(0);
   const [enriching, setEnriching] = useState<number>(0);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -16,6 +17,7 @@ export function useFlights() {
 
     async function poll() {
       ts("fetch_start");
+      if (!cancelled) setIsFetching(true);
       try {
         const res = await fetch("/api/flights");
         ts("fetch_response", { status: res.status });
@@ -31,6 +33,8 @@ export function useFlights() {
         ts("setstate_done");
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : String(e));
+      } finally {
+        if (!cancelled) setIsFetching(false);
       }
     }
 
@@ -62,5 +66,5 @@ export function useFlights() {
     };
   }, []);
 
-  return { flights, lastUpdate, enriching, error };
+  return { flights, lastUpdate, enriching, isFetching, error };
 }

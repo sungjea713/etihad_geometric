@@ -7,4 +7,8 @@ public/cesium/
 .claude/*
 !.claude/rules/
 !.claude/rules/**
-quotes/
+quotes/*
+!quotes/output/
+quotes/output/*
+!quotes/output/quotes.final.json
+clover/

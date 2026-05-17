@@ -10,18 +10,24 @@ export function TabBar({ activeTab, onChange, count, lastUpdate, error }: Props)
   const ago = lastUpdate ? Math.max(0, Math.floor((Date.now() - lastUpdate) / 1000)) : null;
   return (
     <div className="tabbar">
-      <span className="brand">✈ ETIHAD LIVE</span>
+      <span className="brand">
+        <span className="brand-icon">✈</span>
+        <span className="brand-full">ETIHAD LIVE</span>
+        <span className="brand-short">ETD</span>
+      </span>
       <button
         className={activeTab === "2d" ? "active" : ""}
         onClick={() => onChange("2d")}
       >
-        2D MAP
+        <span className="tab-full">2D MAP</span>
+        <span className="tab-short">2D</span>
       </button>
       <button
         className={activeTab === "3d" ? "active" : ""}
         onClick={() => onChange("3d")}
       >
-        3D GLOBE
+        <span className="tab-full">3D GLOBE</span>
+        <span className="tab-short">3D</span>
       </button>
       <span className="status">
         {error ? (
@@ -29,7 +35,12 @@ export function TabBar({ activeTab, onChange, count, lastUpdate, error }: Props)
         ) : (
           <>
             <span className="dot" />
-            {count} AIRBORNE {ago !== null && `· UPDATED ${ago}s AGO`}
+            <span className="status-full">
+              {count} AIRBORNE {ago !== null && `· UPDATED ${ago}s AGO`}
+            </span>
+            <span className="status-short">
+              {count} · {ago !== null ? `${ago}s` : "—"}
+            </span>
           </>
         )}
       </span>

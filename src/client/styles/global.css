@@ -111,6 +111,370 @@ html, body, #root {
 }
 .map-container { z-index: 1; }
 
+.shooting-stars {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 22;
+  pointer-events: none;
+  display: block;
+}
+.shooting-hitboxes {
+  position: absolute;
+  inset: 0;
+  z-index: 23;
+  pointer-events: none;
+}
+.shoot-hitbox {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  margin: 0;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.shoot-hitbox:hover {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
+}
+.shoot-hitbox.tier-silver:hover  { background: radial-gradient(circle, rgba(210, 220, 232, 0.3), transparent 70%); }
+.shoot-hitbox.tier-golden:hover  { background: radial-gradient(circle, rgba(255, 215, 0, 0.35), transparent 70%); }
+.shoot-hitbox.tier-platinum:hover { background: radial-gradient(circle, rgba(185, 242, 255, 0.4), transparent 70%); }
+
+/* Luck card */
+.luck-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  background: rgba(2, 6, 13, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: luck-overlay-in 250ms ease-out;
+}
+@keyframes luck-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.luck-card {
+  position: relative;
+  background: linear-gradient(180deg, #050d18, #02060d);
+  border: 1px solid var(--tier-color);
+  box-shadow:
+    0 0 60px color-mix(in srgb, var(--tier-color) 40%, transparent),
+    0 10px 50px rgba(0, 0, 0, 0.7);
+  border-radius: 16px;
+  padding: 40px 56px 32px;
+  width: 520px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 60px);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  text-align: center;
+  color: #e8f0f5;
+  animation: luck-card-in 450ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  display: flex;
+  flex-direction: column;
+}
+@keyframes luck-card-in {
+  from { transform: scale(0.6) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.luck-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: transparent;
+  color: var(--tier-color);
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 10px;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 120ms;
+}
+.luck-close:hover { opacity: 1; }
+
+.luck-clover-wrap {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.luck-clover {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter:
+    drop-shadow(0 0 14px var(--tier-color))
+    drop-shadow(0 0 32px color-mix(in srgb, var(--tier-color) 55%, transparent));
+  animation: clover-breathe 2.4s ease-in-out infinite;
+}
+.luck-clover svg {
+  width: 100%;
+  height: 100%;
+}
+@keyframes clover-breathe {
+  0%, 100% { transform: scale(1) rotate(-2deg); }
+  50% { transform: scale(1.08) rotate(2deg); }
+}
+
+.luck-spark {
+  position: absolute;
+  background: var(--tier-color);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: spark-blink-dot 1.8s ease-in-out infinite;
+  border-radius: 50%;
+  filter:
+    drop-shadow(0 0 5px var(--tier-color))
+    drop-shadow(0 0 10px color-mix(in srgb, var(--tier-color) 60%, transparent));
+}
+.luck-spark.star {
+  border-radius: 0;
+  clip-path: polygon(
+    50% 0%, 58% 42%, 100% 50%, 58% 58%,
+    50% 100%, 42% 58%, 0% 50%, 42% 42%
+  );
+  animation-name: spark-blink-star;
+}
+@keyframes spark-blink-dot {
+  0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+@keyframes spark-blink-star {
+  0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(0deg); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.3) rotate(45deg); }
+}
+
+.luck-title {
+  color: var(--tier-color);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px color-mix(in srgb, var(--tier-color) 60%, transparent);
+  margin-bottom: 12px;
+}
+.luck-points {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.luck-plus {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--tier-color);
+  text-shadow: 0 0 12px var(--tier-color);
+}
+.luck-points-label {
+  color: #9fb0bc;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.luck-quote {
+  margin: 20px -24px 0;
+  padding: 18px 24px 4px;
+  border-top: 1px solid color-mix(in srgb, var(--tier-color) 30%, transparent);
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.luck-quote-scroll {
+  flex: 1;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+  text-align: left;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--tier-color) 45%, transparent) transparent;
+}
+.luck-quote-scroll::-webkit-scrollbar { width: 6px; }
+.luck-quote-scroll::-webkit-scrollbar-track { background: transparent; }
+.luck-quote-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--tier-color) 45%, transparent);
+  border-radius: 3px;
+}
+.luck-quote-translation {
+  color: #e2eef5;
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: 0.2px;
+  margin-bottom: 10px;
+}
+.luck-quote-original {
+  color: #8fa3b2;
+  font-size: 12px;
+  line-height: 1.5;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+.luck-quote-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--tier-color);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.luck-quote-author { font-weight: 600; }
+.luck-quote-year {
+  color: color-mix(in srgb, var(--tier-color) 70%, white);
+  opacity: 0.75;
+}
+.luck-quote-source {
+  color: #6b8a7f;
+  font-size: 10px;
+  margin-top: 6px;
+  letter-spacing: 0.3px;
+}
+
+/* Hide short variants by default (desktop) */
+.brand-short, .tab-short, .status-short { display: none; }
+
+/* =====================  Mobile  ===================== */
+@media (max-width: 720px) {
+  .tabbar {
+    padding: 8px 10px;
+    height: 46px;
+    gap: 2px;
+    overflow: hidden;
+  }
+  .tabbar .brand {
+    margin-right: 10px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .brand-icon { display: inline; }
+  .brand-full { display: none; }
+  .brand-short { display: inline; }
+
+  .tabbar button {
+    padding: 4px 10px;
+    font-size: 11px;
+    letter-spacing: 0.6px;
+    flex-shrink: 0;
+  }
+  .tab-full { display: none; }
+  .tab-short { display: inline; }
+
+  .tabbar .status {
+    font-size: 10px;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+  }
+  .status-full { display: none; }
+  .status-short { display: inline; }
+
+  /* FlightTable — full-width drawer on mobile */
+  .flight-table {
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    max-height: 60vh;
+    border-radius: 10px 10px 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+  .flight-table.ft-collapsed {
+    max-height: none;
+  }
+  .ft-header {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .ft-title-main { font-size: 11px; }
+  .ft-title-count { font-size: 10px; }
+  .ft-actions button {
+    padding: 3px 7px;
+    font-size: 9px;
+  }
+  .ft-collapse {
+    width: 24px;
+    height: 22px;
+    font-size: 13px;
+    margin-left: 2px;
+  }
+  .flight-table thead th {
+    padding: 5px 6px;
+    font-size: 8px;
+  }
+  .flight-table tbody td {
+    padding: 4px 6px;
+  }
+  .flight-table table { font-size: 10px; }
+  .ft-airport-name {
+    font-size: 9px;
+    max-width: 95px;
+  }
+  .ft-callsign { font-size: 11px; }
+
+  /* LoadingHud — fits screen */
+  .loading-hud {
+    min-width: 0;
+    width: calc(100vw - 32px);
+    max-width: 360px;
+    padding: 28px 24px 22px;
+    gap: 16px;
+  }
+  .loading-spinner-wrap { width: 80px; height: 80px; }
+  .loading-spinner { border-width: 3px; }
+  .loading-spinner-inner { inset: 14px; border-width: 2px; }
+  .loading-icon { font-size: 30px; }
+  .loading-title { font-size: 13px; letter-spacing: 1px; }
+  .loading-sub { font-size: 10px; }
+
+  /* LuckCard */
+  .luck-card {
+    width: calc(100vw - 24px);
+    padding: 28px 20px 22px;
+    border-radius: 12px;
+  }
+  .luck-clover-wrap { width: 170px; height: 170px; margin-bottom: 16px; }
+  .luck-clover { width: 140px; height: 140px; }
+  .luck-title { font-size: 15px; letter-spacing: 1px; }
+  .luck-plus { font-size: 28px; }
+  .luck-quote {
+    margin: 16px -12px 0;
+    padding: 14px 12px 4px;
+  }
+  .luck-quote-scroll { max-height: 200px; }
+  .luck-quote-translation { font-size: 13px; }
+  .luck-quote-original { font-size: 11px; }
+
+  /* Flight card popup on 3D */
+  .flight-card-anchored { max-width: calc(100vw - 32px); }
+}
+
+@media (max-width: 420px) {
+  .tabbar { gap: 1px; padding: 6px 8px; }
+  .tabbar .brand { margin-right: 6px; font-size: 11px; }
+  .tabbar button { padding: 3px 7px; font-size: 10px; }
+  .tabbar .status { font-size: 9px; }
+}
+
 .maplibregl-popup-content,
 .flight-card {
   background: rgba(6, 16, 22, 0.97);

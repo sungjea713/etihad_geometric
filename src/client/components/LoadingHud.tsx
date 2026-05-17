@@ -7,6 +7,7 @@ interface Props {
   enriching: number;
   lastUpdate: number;
   mapReady: boolean;
+  refreshing: boolean;
 }
 
 const SUB_MESSAGES: Record<string, string[]> = {
@@ -31,6 +32,11 @@ const SUB_MESSAGES: Record<string, string[]> = {
     "Initializing canvas...",
     "Rendering live fleet...",
   ],
+  refresh: [
+    "Pulling latest positions...",
+    "Syncing with OpenSky...",
+    "Updating flight plans...",
+  ],
 };
 
 const TITLES: Record<string, string> = {
@@ -38,6 +44,7 @@ const TITLES: Record<string, string> = {
   scan: "Scanning skies",
   enrich: "Acquiring flight plans",
   render: "Rendering map",
+  refresh: "Refreshing data",
 };
 
 // pseudo timeline (ms from mount)
@@ -47,9 +54,9 @@ const T_ENRICH = 1300;
 const T_RENDER = 2900;
 const T_PSEUDO_DONE = 3500;
 
-type Stage = "boot" | "scan" | "enrich" | "render";
+type Stage = "boot" | "scan" | "enrich" | "render" | "refresh";
 
-export function LoadingHud({ flightCount, enrichedCount, enriching, lastUpdate, mapReady }: Props) {
+export function LoadingHud({ flightCount, enrichedCount, enriching, lastUpdate, mapReady, refreshing }: Props) {
   const mountedAtRef = useRef(Date.now());
   const [now, setNow] = useState(Date.now());
   const [phase, setPhase] = useState<"show" | "fade" | "hidden">("show");
@@ -65,7 +72,7 @@ export function LoadingHud({ flightCount, enrichedCount, enriching, lastUpdate, 
   const pseudoDone = elapsed >= T_PSEUDO_DONE;
 
   const dataReady =
-    lastUpdate > 0 && flightCount > 0 && enriching === 0;
+    lastUpdate > 0 && flightCount > 0 && enriching === 0 && !refreshing;
   const allReady = pseudoDone && dataReady && mapReady;
 
   useEffect(() => {
@@ -101,7 +108,9 @@ export function LoadingHud({ flightCount, enrichedCount, enriching, lastUpdate, 
 
   // compute pseudo stage from elapsed time
   let stage: Stage;
-  if (elapsed < T_SCAN) stage = "boot";
+  if (pseudoDone && (refreshing || enriching > 0) && lastUpdate > 0) {
+    stage = "refresh";
+  } else if (elapsed < T_SCAN) stage = "boot";
   else if (elapsed < T_ENRICH) stage = "scan";
   else if (elapsed < T_RENDER) stage = "enrich";
   else stage = "render";

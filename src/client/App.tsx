@@ -5,6 +5,8 @@ import { TwoDMap } from "./components/TwoDMap";
 import { ThreeDGlobe } from "./components/ThreeDGlobe";
 import { LoadingHud } from "./components/LoadingHud";
 import { FlightTable } from "./components/FlightTable";
+import { ShootingStarField, type ShootTier } from "./components/ShootingStarField";
+import { LuckCard } from "./components/LuckCard";
 import { useFlights } from "./hooks/useFlights";
 import { ts } from "./utils/log";
 
@@ -21,8 +23,9 @@ function App() {
   const [tab, setTab] = useState<Tab>(() => tabFromPath(location.pathname));
   const [mapReady, setMapReady] = useState(false);
   const [visibleSet, setVisibleSet] = useState<Set<string>>(new Set());
+  const [pickedShoot, setPickedShoot] = useState<ShootTier | null>(null);
   const initializedRef = useRef(false);
-  const { flights, lastUpdate, enriching, error } = useFlights();
+  const { flights, lastUpdate, enriching, isFetching, error } = useFlights();
 
   useEffect(() => {
     const onPop = () => setTab(tabFromPath(location.pathname));
@@ -30,12 +33,27 @@ function App() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  // Initialize visibleSet to "show all" the first time flights arrive.
-  // After that, leave it alone — user controls via buttons / checkboxes.
+  // First arrival → show all.
+  // Subsequent polls → auto-add any newly-spotted aircraft so a fresh ETD
+  // callsign doesn't quietly stay hidden. User can still hide them via the
+  // table.
   useEffect(() => {
-    if (initializedRef.current || flights.length === 0) return;
-    initializedRef.current = true;
-    setVisibleSet(new Set(flights.map((f) => f.icao24)));
+    if (flights.length === 0) return;
+    setVisibleSet((prev) => {
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        return new Set(flights.map((f) => f.icao24));
+      }
+      let changed = false;
+      const next = new Set(prev);
+      for (const f of flights) {
+        if (!next.has(f.icao24)) {
+          next.add(f.icao24);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
   }, [flights]);
 
   const handleChange = (next: Tab) => {
@@ -79,6 +97,7 @@ function App() {
           enriching={enriching}
           lastUpdate={lastUpdate}
           mapReady={mapReady}
+          refreshing={isFetching}
         />
         <div className={`map-fade ${mapReady ? "shown" : ""}`}>
           {tab === "2d" ? (
@@ -106,6 +125,10 @@ function App() {
           onShowAll={showAll}
           onHideAll={hideAll}
         />
+        <ShootingStarField onPick={setPickedShoot} />
+        {pickedShoot && (
+          <LuckCard tier={pickedShoot} onClose={() => setPickedShoot(null)} />
+        )}
       </div>
     </div>
   );

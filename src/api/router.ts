@@ -2,6 +2,28 @@ import { getFlights, getStatus } from "./flight-cache";
 
 const serverStart = Date.now();
 
+interface Quote {
+  text: string;
+  textKo?: string;
+  author?: string;
+  year?: string;
+  source?: string;
+}
+
+let quotesCache: Quote[] | null = null;
+async function loadQuotes(): Promise<Quote[]> {
+  if (quotesCache) return quotesCache;
+  try {
+    const data = (await Bun.file("quotes/output/quotes.final.json").json()) as Quote[];
+    quotesCache = Array.isArray(data) ? data : [];
+    console.log(`[quotes] loaded ${quotesCache.length} entries`);
+  } catch (e) {
+    console.error("[quotes] load failed:", e);
+    quotesCache = [];
+  }
+  return quotesCache;
+}
+
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -36,6 +58,13 @@ export async function handleApi(req: Request): Promise<Response | null> {
 
     if (path === "/api/health" && req.method === "GET") {
       return json({ ok: true, ...getStatus() });
+    }
+
+    if (path === "/api/quote" && req.method === "GET") {
+      const all = await loadQuotes();
+      if (all.length === 0) return json({ error: "no quotes available" }, 503);
+      const pick = all[Math.floor(Math.random() * all.length)];
+      return json(pick);
     }
 
     if (path === "/api/diag" && req.method === "GET") {
