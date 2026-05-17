@@ -25,7 +25,7 @@ export function FlightTable({
   onShowAll,
   onHideAll,
 }: Props) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const sorted = [...flights].sort((a, b) => a.callsign.trim().localeCompare(b.callsign.trim()));
   const visibleCount = flights.filter((f) => visibleSet.has(f.icao24)).length;
 

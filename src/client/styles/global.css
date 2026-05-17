@@ -387,33 +387,6 @@ html, body, #root {
   }
 }
 
-.hyerim-spark {
-  position: absolute;
-  background: #e8eef8;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  animation: hyerim-spark-dot 1.8s ease-in-out infinite;
-  filter:
-    drop-shadow(0 0 4px rgba(232, 238, 248, 0.95))
-    drop-shadow(0 0 10px rgba(190, 205, 225, 0.7));
-}
-.hyerim-spark.star {
-  border-radius: 0;
-  clip-path: polygon(
-    50% 0%, 58% 42%, 100% 50%, 58% 58%,
-    50% 100%, 42% 58%, 0% 50%, 42% 42%
-  );
-  animation-name: hyerim-spark-star;
-}
-@keyframes hyerim-spark-dot {
-  0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
-  50% { opacity: 0.85; transform: translate(-50%, -50%) scale(1.1); }
-}
-@keyframes hyerim-spark-star {
-  0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(0deg); }
-  50% { opacity: 0.95; transform: translate(-50%, -50%) scale(1.2) rotate(45deg); }
-}
 
 /* =====================  Mobile  ===================== */
 @media (max-width: 720px) {
@@ -579,21 +552,34 @@ html, body, #root {
   .loading-title { font-size: 13px; letter-spacing: 1px; }
   .loading-sub { font-size: 10px; }
 
-  /* LuckCard */
+  /* LuckCard — fit the viewport with a fixed top/bottom margin */
+  .luck-overlay { padding: 16px; box-sizing: border-box; }
   .luck-card {
     width: calc(100vw - 24px);
-    padding: 28px 20px 22px;
+    max-width: 100%;
+    height: auto;
+    max-height: calc(100vh - 32px);
+    padding: 22px 18px 18px;
     border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
-  .luck-clover-wrap { width: 170px; height: 170px; margin-bottom: 16px; }
-  .luck-clover { width: 140px; height: 140px; }
-  .luck-title { font-size: 15px; letter-spacing: 1px; }
-  .luck-plus { font-size: 28px; }
+  .luck-clover-wrap { width: 140px; height: 140px; margin-bottom: 12px; flex-shrink: 0; }
+  .luck-clover { width: 110px; height: 110px; }
+  .luck-title { font-size: 14px; letter-spacing: 0.9px; }
+  .luck-plus { font-size: 24px; }
+  .luck-points { margin-bottom: 4px; }
   .luck-quote {
-    margin: 16px -12px 0;
-    padding: 14px 12px 4px;
+    margin: 14px -10px 0;
+    padding: 12px 10px 4px;
+    flex: 1;
+    min-height: 0;
   }
-  .luck-quote-scroll { max-height: 200px; }
+  .luck-quote-scroll {
+    max-height: none;
+    flex: 1;
+  }
   .luck-quote-translation { font-size: 13px; }
   .luck-quote-original { font-size: 11px; }
 

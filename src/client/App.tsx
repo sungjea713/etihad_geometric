@@ -92,28 +92,6 @@ function App() {
       />
       <div className="main">
         <div className="for-hyerim-wrap" aria-label="Message for Hyerim">
-          {Array.from({ length: 16 }, (_, i) => {
-            const isStar = i % 2 === 0;
-            const x = (i * 37) % 100;
-            const y = (i * 53) % 100;
-            const size = isStar ? 8 + ((i * 3) % 7) : 3 + (i % 3);
-            const delay = (i * 0.21) % 2.4;
-            const duration = 1.6 + ((i * 0.31) % 1.4);
-            return (
-              <span
-                key={i}
-                className={`hyerim-spark ${isStar ? "star" : ""}`}
-                style={{
-                  left: `${x}%`,
-                  top: `${y}%`,
-                  width: `${size}px`,
-                  height: `${size}px`,
-                  animationDelay: `${delay}s`,
-                  animationDuration: `${duration}s`,
-                }}
-              />
-            );
-          })}
           <div className="for-hyerim">
             어딘가 비행하고 있을 혜림이에게 행운과 행복을
           </div>

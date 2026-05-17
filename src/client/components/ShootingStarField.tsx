@@ -144,8 +144,12 @@ export function ShootingStarField({ onPick }: Props) {
         const fadeOut = Math.min(1, (1 - lifeProgress) * 3);
         const a = Math.min(fadeIn, fadeOut);
         const [r, g, b] = sh.tier.color;
-        const tailX = sh.x - sh.vx * sh.tier.trailMul;
-        const tailY = sh.y - sh.vy * sh.tier.trailMul;
+        // tail multiplier scales up on smaller viewports so the trail
+        // doesn't look stubby on phones. width >= 800 keeps the original
+        // ratio; below that the trail gets proportionally longer.
+        const adjustedMul = sh.tier.trailMul * Math.max(1, 800 / width);
+        const tailX = sh.x - sh.vx * adjustedMul;
+        const tailY = sh.y - sh.vy * adjustedMul;
 
         // tail
         const grad = ctx.createLinearGradient(sh.x, sh.y, tailX, tailY);
