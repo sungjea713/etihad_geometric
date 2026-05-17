@@ -1,8 +1,12 @@
 import type { Flight } from "../types/flight";
 
-const TOKEN_URL = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token";
-const STATES_URL = "https://opensky-network.org/api/states/all";
-const FLIGHTS_AIRCRAFT_URL = "https://opensky-network.org/api/flights/aircraft";
+const OPENSKY_AUTH_BASE =
+  process.env.OPENSKY_AUTH_PROXY_URL ?? "https://auth.opensky-network.org";
+const OPENSKY_BASE = process.env.OPENSKY_PROXY_URL ?? "https://opensky-network.org";
+
+const TOKEN_URL = `${OPENSKY_AUTH_BASE}/auth/realms/opensky-network/protocol/openid-connect/token`;
+const STATES_URL = `${OPENSKY_BASE}/api/states/all`;
+const FLIGHTS_AIRCRAFT_URL = `${OPENSKY_BASE}/api/flights/aircraft`;
 const CALLSIGN_PREFIX = "ETD";
 
 let tokenCache: { token: string; expiresAt: number } | null = null;
