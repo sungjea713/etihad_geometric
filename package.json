@@ -1,0 +1,21 @@
+{
+  "name": "etihad-geometric",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun --hot src/server.ts",
+    "start": "bun src/server.ts",
+    "postinstall": "bun scripts/copy-cesium-assets.ts"
+  },
+  "dependencies": {
+    "cesium": "^1.121.0",
+    "maplibre-gl": "^4.7.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "bun-types": "latest"
+  }
+}

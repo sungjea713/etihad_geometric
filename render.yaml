@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: etihad-geometric
+    runtime: bun
+    plan: free
+    buildCommand: bun install
+    startCommand: bun src/server.ts
+    envVars:
+      - key: OPENSKY_CLIENT_ID
+        sync: false
+      - key: OPENSKY_CLIENT_SECRET
+        sync: false
+      - key: CESIUM_ION_TOKEN
+        sync: false

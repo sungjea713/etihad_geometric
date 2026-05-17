@@ -1,0 +1,9 @@
+node_modules/
+.env
+credentials.json
+.DS_Store
+dist/
+public/cesium/
+.claude/*
+!.claude/rules/
+!.claude/rules/**
